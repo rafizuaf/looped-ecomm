@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 
 type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE';
-type AuditEntity = 'User' | 'Product' | 'Order';
+type AuditEntity = 'USER' | 'PRODUCT' | 'ORDER';
 
 export async function createAuditLog({
   action,

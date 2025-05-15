@@ -37,7 +37,7 @@ export async function PATCH(
     // Create audit log
     await createAuditLog({
       action: 'UPDATE',
-      entity: 'Product',
+      entity: 'PRODUCT',
       entityId: product.id,
       performedBy: session.user.id,
     });
@@ -73,7 +73,7 @@ export async function DELETE(
     // Create audit log
     await createAuditLog({
       action: 'DELETE',
-      entity: 'Product',
+      entity: 'PRODUCT',
       entityId: product.id,
       performedBy: session.user.id,
     });

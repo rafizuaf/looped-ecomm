@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     // Create audit log
     await createAuditLog({
       action: 'CREATE',
-      entity: 'Product',
+      entity: 'PRODUCT',
       entityId: product.id,
       performedBy: session.user.id,
     });
