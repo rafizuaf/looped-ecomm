@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 250, 250, 250;
+  --background-end-rgb: 250, 250, 250;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 4, 4, 4;
+    --background-end-rgb: 4, 4, 4;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 45 100% 38%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 45 41% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 45 100% 38%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 45 100% 38%;
+    --chart-1: 45 100% 38%;
+    --chart-2: 45 41% 45%;
+    --chart-3: 45 100% 38%;
+    --chart-4: 45 41% 45%;
+    --chart-5: 45 100% 38%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 1.6%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 1.6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 1.6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 100% 55%;
+    --primary-foreground: 0 0% 1.6%;
+    --secondary: 45 41% 35%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 45 100% 55%;
+    --accent-foreground: 0 0% 1.6%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 45 100% 55%;
+    --chart-1: 45 100% 55%;
+    --chart-2: 45 41% 35%;
+    --chart-3: 45 100% 55%;
+    --chart-4: 45 41% 35%;
+    --chart-5: 45 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
