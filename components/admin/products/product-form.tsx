@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -47,9 +48,13 @@ export function ProductForm({ initialData }: ProductFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
-      ...initialData,
+      name: initialData.name,
+      description: initialData.description || undefined,
       price: initialData.price / 100,
       cost: initialData.cost / 100,
+      stock: initialData.stock,
+      category: initialData.category || undefined,
+      images: initialData.images,
     } : {
       name: '',
       description: '',

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -37,6 +38,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { EyeIcon, MoreHorizontal, PencilIcon, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ProductsDataTableProps {
   data: Product[];
@@ -52,15 +54,15 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
       accessorKey: 'name',
       header: 'Name',
       cell: ({ row }) => (
-        <div className="flex items-center gap-x-2 max-w-[400px]">
+        <div className="flex items-center gap-x-3 max-w-[400px]">
           {row.original.images.length > 0 ? (
             <img
               src={row.original.images[0]}
               alt={row.original.name}
-              className="h-10 w-10 rounded-md object-cover"
+              className="h-12 w-12 rounded-md object-cover"
             />
           ) : (
-            <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center">
+            <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center">
               <span className="text-xs text-muted-foreground">No img</span>
             </div>
           )}
@@ -73,17 +75,29 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
     {
       accessorKey: 'category',
       header: 'Category',
-      cell: ({ row }) => <div>{row.original.category || 'Uncategorized'}</div>,
+      cell: ({ row }) => (
+        <div className="capitalize">{row.original.category || 'Uncategorized'}</div>
+      ),
     },
     {
       accessorKey: 'price',
       header: 'Price',
-      cell: ({ row }) => formatPrice(row.original.price),
+      cell: ({ row }) => (
+        <div className="font-medium">{formatPrice(row.original.price)}</div>
+      ),
     },
     {
       accessorKey: 'stock',
       header: 'Stock',
-      cell: ({ row }) => row.original.stock,
+      cell: ({ row }) => (
+        <div className={cn(
+          "font-medium",
+          row.original.stock === 0 && "text-destructive",
+          row.original.stock < 10 && "text-orange-500"
+        )}>
+          {row.original.stock}
+        </div>
+      ),
     },
     {
       id: 'actions',
@@ -115,22 +129,25 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-[160px]">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/products/${product.id}`}>
+                <Link href={`/products/${product.id}`} className="flex items-center">
                   <EyeIcon className="mr-2 h-4 w-4" />
                   View
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/admin/products/${product.id}`}>
+                <Link href={`/admin/products/${product.id}`} className="flex items-center">
                   <PencilIcon className="mr-2 h-4 w-4" />
                   Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete} className="text-destructive">
+              <DropdownMenuItem 
+                onClick={onDelete} 
+                className="text-destructive focus:text-destructive"
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
@@ -158,7 +175,7 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search products..."
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
@@ -167,6 +184,24 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
           }
           className="max-w-sm"
         />
+        <div className="flex items-center gap-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -194,6 +229,7 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-muted/50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -217,24 +253,6 @@ export function ProductsDataTable({ data }: ProductsDataTableProps) {
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
       </div>
     </div>
   );

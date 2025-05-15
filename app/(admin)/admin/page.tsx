@@ -2,15 +2,7 @@ import { db } from '@/lib/db';
 import { excludeDeleted } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { SalesChart } from '@/components/charts/SalesChart';
 import { 
   ShoppingBag, 
   Users, 
@@ -57,123 +49,107 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your store.</p>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your store performance and metrics.</p>
       </div>
       
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{productCount}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{productCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               Items in inventory
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+            <ShoppingBag className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{orderCount}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{orderCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               Orders placed
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userCount}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{userCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               Registered customers
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              ${latestOrders.reduce((acc, order) => acc + order.total, 0) / 100}
+            <div className="text-3xl font-bold">
+              ${(latestOrders.reduce((acc, order) => acc + order.total, 0) / 100).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1">
               Lifetime sales
             </p>
           </CardContent>
         </Card>
       </div>
       
-      <Tabs defaultValue="overview">
-        <TabsList>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <Card className="col-span-4">
+        <TabsContent value="overview" className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle>Weekly Sales</CardTitle>
             </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-96">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={salesData}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="sales" fill="hsl(var(--chart-1))" />
-                  </BarChart>
-                </ResponsiveContainer>
+            <CardContent>
+              <div className="h-[300px]">
+                <SalesChart data={salesData} />
               </div>
             </CardContent>
           </Card>
           
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Recent Orders</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {latestOrders.length === 0 ? (
                     <p className="text-muted-foreground">No orders yet.</p>
                   ) : (
                     latestOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{order.user.name}</p>
+                      <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                        <div className="space-y-1">
+                          <p className="font-medium leading-none">{order.user.name}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(order.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">${order.total / 100}</p>
-                          <p className="text-sm text-muted-foreground">{order.status}</p>
+                          <p className="font-medium leading-none">${(order.total / 100).toFixed(2)}</p>
+                          <p className="text-sm text-muted-foreground capitalize">{order.status}</p>
                         </div>
                       </div>
                     ))
@@ -187,11 +163,11 @@ export default async function AdminDashboardPage() {
                 <CardTitle>Recent Activities</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {recentLogs.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{log.action} {log.entity}</p>
+                    <div key={log.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                      <div className="space-y-1">
+                        <p className="font-medium leading-none capitalize">{log.action} {log.entity}</p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(log.timestamp).toLocaleDateString()}
                         </p>

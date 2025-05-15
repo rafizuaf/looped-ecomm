@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function SiteHeader() {
   const { data: session } = useSession();
@@ -72,6 +73,7 @@ export function SiteHeader() {
         
         {/* Right Side Actions */}
         <div className="flex items-center space-x-2 ml-auto">
+          <ThemeToggle />
           <Link href="/cart" className="p-2">
             <ShoppingCart className="h-5 w-5" />
           </Link>

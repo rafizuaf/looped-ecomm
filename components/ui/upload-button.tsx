@@ -21,12 +21,10 @@ export function UploadButton({
   onUploadError,
 }: UploadButtonProps) {
   return (
-    <UploadThingButton<OurFileRouter>
+    <UploadThingButton<OurFileRouter, keyof OurFileRouter>
       endpoint={endpoint}
       onClientUploadComplete={onClientUploadComplete}
       onUploadError={onUploadError}
     />
   );
-}
-  )
 }
