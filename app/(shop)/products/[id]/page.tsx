@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import { ProductGallery } from '@/components/shop/product-gallery';

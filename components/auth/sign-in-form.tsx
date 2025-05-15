@@ -58,8 +58,18 @@ export function SignInForm() {
         return;
       }
 
+      // Get the session to check user role
+      const response = await fetch('/api/auth/session');
+      const session = await response.json();
+
       router.refresh();
-      router.push('/');
+      
+      // Redirect based on role
+      if (session?.user?.role === 'SUPERADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       setError('Something went wrong. Please try again.');
       setIsLoading(false);

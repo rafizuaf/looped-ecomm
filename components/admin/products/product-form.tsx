@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { UploadButton } from '@/components/ui/upload-button';
-import { Trash2, X } from 'lucide-react';
+import { Trash2, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -40,6 +40,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function ProductForm({ initialData }: ProductFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const title = initialData ? 'Edit Product' : 'Create Product';
   const action = initialData ? 'Save changes' : 'Create';
@@ -127,6 +128,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
   const handleImageUpload = (imageUrl: string) => {
     const currentImages = form.getValues('images');
+    if (currentImages.length >= 4) {
+      toast.error('Maximum 4 images allowed');
+      return;
+    }
     form.setValue('images', [...currentImages, imageUrl]);
   };
 
@@ -263,22 +268,29 @@ export function ProductForm({ initialData }: ProductFormProps) {
                       <UploadButton
                         endpoint="imageUploader"
                         onClientUploadComplete={(res) => {
+                          setIsUploading(false);
                           if (res?.length) {
                             handleImageUpload(res[0].url);
-                            toast.success('Image uploaded');
+                            toast.success('Image uploaded successfully');
                           }
                         }}
                         onUploadError={(error: Error) => {
+                          setIsUploading(false);
                           toast.error(`Upload failed: ${error.message}`);
                         }}
                       />
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 )}
               </div>
               {form.watch('images').length === 0 && (
                 <p className="text-muted-foreground text-sm mt-2">
-                  Add at least one image for your product
+                  Add at least one image for your product (max 4 images)
                 </p>
               )}
             </div>
