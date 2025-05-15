@@ -3,23 +3,40 @@ import { excludeDeleted } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SalesChart } from '@/components/charts/SalesChart';
-import { 
-  ShoppingBag, 
-  Users, 
+import {
+  ShoppingBag,
+  Users,
   DollarSign,
-  Package
+  Package,
 } from 'lucide-react';
+import { OrdersList } from '@/components/admin/OrdersList';
+import { AuditLogsList } from '@/components/admin/AuditLogsList';
 
-export default async function AdminDashboardPage() {
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: { orderPage?: string; logPage?: string };
+}) {
+  const orderPage = Number(searchParams.orderPage) || 1;
+  const logPage = Number(searchParams.logPage) || 1;
+  const itemsPerPage = 5;
+
   // Get counts
   const productCount = await db.product.count(excludeDeleted());
   const userCount = await db.user.count(excludeDeleted());
   const orderCount = await db.order.count(excludeDeleted());
-  
-  // Get latest orders
+
+  // Get total counts for pagination
+  const totalOrders = await db.order.count({
+    where: { deletedAt: null }
+  });
+
+  const totalLogs = await db.auditLog.count();
+
+  // Get latest orders with pagination
   const latestOrders = await db.order.findMany({
     where: { deletedAt: null },
-    include: { 
+    include: {
       user: true,
       items: {
         include: {
@@ -28,15 +45,10 @@ export default async function AdminDashboardPage() {
       },
     },
     orderBy: { createdAt: 'desc' },
-    take: 5,
+    skip: (orderPage - 1) * itemsPerPage,
+    take: itemsPerPage,
   });
-  
-  // Get recent audit logs
-  const recentLogs = await db.auditLog.findMany({
-    orderBy: { timestamp: 'desc' },
-    take: 10,
-  });
-  
+
   // Generate some mock data for charts
   const salesData = [
     { name: 'Mon', sales: 2400 },
@@ -54,7 +66,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
         <p className="text-muted-foreground">Overview of your store performance and metrics.</p>
       </div>
-      
+
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -68,7 +80,7 @@ export default async function AdminDashboardPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -81,7 +93,7 @@ export default async function AdminDashboardPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -94,7 +106,7 @@ export default async function AdminDashboardPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -110,7 +122,7 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -128,56 +140,31 @@ export default async function AdminDashboardPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Recent Orders</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {latestOrders.length === 0 ? (
-                    <p className="text-muted-foreground">No orders yet.</p>
-                  ) : (
-                    latestOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                        <div className="space-y-1">
-                          <p className="font-medium leading-none">{order.user.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium leading-none">${(order.total / 100).toFixed(2)}</p>
-                          <p className="text-sm text-muted-foreground capitalize">{order.status}</p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <OrdersList
+                  initialPage={orderPage}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={totalOrders}
+                />
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Recent Activities</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {recentLogs.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                      <div className="space-y-1">
-                        <p className="font-medium leading-none capitalize">{log.action} {log.entity}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(log.timestamp).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        by {log.performedBy.slice(0, 6)}...
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <AuditLogsList
+                  initialPage={logPage}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={totalLogs}
+                />
               </CardContent>
             </Card>
           </div>
